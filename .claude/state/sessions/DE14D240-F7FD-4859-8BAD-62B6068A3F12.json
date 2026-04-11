@@ -1,0 +1,40 @@
+{
+  "session_id": "DE14D240-F7FD-4859-8BAD-62B6068A3F12",
+  "parent_session_id": null,
+  "state": "stopped",
+  "state_version": 1,
+  "started_at": "2026-04-10T15:19:21Z",
+  "updated_at": "2026-04-11T02:32:06Z",
+  "resume_token": "DA6AADE1-260D-4089-A4CB-9B2E93825CBE",
+  "event_seq": 15,
+  "last_event_id": "event-000015",
+  "fork_count": 0,
+  "orchestration": {
+    "max_state_retries": 3,
+    "retry_backoff_seconds": 10
+  },
+  "cwd": "/Users/troy.t/work/basic-english-learner",
+  "project_name": "basic-english-learner",
+  "prompt_seq": 4,
+  "git": {
+    "branch": "(no git)",
+    "uncommitted_changes": 0,
+    "last_commit": "none"
+  },
+  "plans": {
+    "exists": false,
+    "last_modified": 0,
+    "wip_tasks": 0,
+    "todo_tasks": 0,
+    "pending_tasks": 0,
+    "completed_tasks": 0
+  },
+  "changes_this_session": [],
+  "intent": "literal",
+  "resumed_at": "2026-04-11T02:32:02Z",
+  "last_message_length": 18,
+  "last_message_hash": "52903409c040b6eb",
+  "ended_at": "2026-04-11T02:32:06Z",
+  "duration_minutes": 1212,
+  "memory_logged": true
+}
