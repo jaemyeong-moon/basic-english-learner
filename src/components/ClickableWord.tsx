@@ -1,4 +1,8 @@
+"use client";
+
+import { useCallback, useRef, useState } from "react";
 import { Token } from "@/types";
+import WordPopup from "./WordPopup";
 
 interface ClickableWordProps {
   token: Token;
@@ -6,24 +10,35 @@ interface ClickableWordProps {
 }
 
 export default function ClickableWord({ token, isHighlighted }: ClickableWordProps) {
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  const handleClose = useCallback(() => setOpen(false), []);
+
   if (!token.isWord) {
     return <span>{token.text}</span>;
   }
 
-  const href = `https://dict.naver.com/nsvendict/#/search?query=${encodeURIComponent(token.text)}`;
-
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`cursor-pointer hover:underline ${
-        isHighlighted
-          ? "font-bold text-indigo-600 dark:text-indigo-400"
-          : "text-inherit"
-      }`}
-    >
-      {token.text}
-    </a>
+    <>
+      <button
+        ref={btnRef}
+        onClick={() => setOpen((v) => !v)}
+        className={`cursor-pointer rounded hover:underline focus:outline-none ${
+          isHighlighted
+            ? "font-bold text-indigo-600 dark:text-indigo-400"
+            : "text-inherit"
+        }`}
+      >
+        {token.text}
+      </button>
+      {open && btnRef.current && (
+        <WordPopup
+          word={token.text}
+          anchorEl={btnRef.current}
+          onClose={handleClose}
+        />
+      )}
+    </>
   );
 }
