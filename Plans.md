@@ -97,3 +97,33 @@
 | 10.1 | 단어 분리 유틸리티 | developer | `src/lib/utils.ts`에 `tokenizeEnglish(sentence)` 함수 추가 — 구두점 분리, 공백 토큰화 | 함수 구현, 예문을 단어+구두점 토큰 배열로 반환 | - | DONE |
 | 10.2 | ClickableWord 컴포넌트 | developer | `src/components/ClickableWord.tsx` — 단어를 클릭하면 Naver 사전으로 이동하는 인라인 컴포넌트 (구두점은 클릭 불가, 하이라이트 단어는 스타일 유지) | 컴포넌트 구현, 단어 클릭 시 새 탭 오픈 | 10.1 | DONE |
 | 10.3 | ExampleSentence 단어 클릭 통합 | developer | `ExampleSentence`에서 영어 예문 렌더링 시 `ClickableWord` 사용 (hover 시 밑줄 힌트, 커서 포인터) | 예문의 모든 단어 클릭 가능, Naver 사전 연결 확인 | 10.2, 9.4 | DONE |
+
+## Phase 11: Supabase 연동 (DB 이관 + 캐싱)
+
+> **설계 결정**: 빌드 타임 정적 생성 + ISR(1시간) + On-Demand Revalidation. 서버 전용 Supabase 클라이언트. DB 부하 제로.
+
+| # | Task | 담당 | 내용 | 완료 기준 | Depends | Status |
+|---|------|------|------|-----------|---------|--------|
+| 11.1 | Supabase 스키마 SQL 작성 | developer | `scripts/schema.sql` — verbs, examples, quiz_questions 테이블 + 인덱스 | SQL 파일 작성 완료 | - | DONE |
+| 11.2 | Supabase 클라이언트 설정 | developer | `src/lib/supabase/server.ts` + `.env.local` 환경변수 설정 | 클라이언트 파일 생성 완료 | - | DONE |
+| 11.3 | 데이터 마이그레이션 스크립트 | developer | `scripts/migrate.ts` — verbs.ts 파싱 → Supabase INSERT | 스크립트 작성 완료 (실행은 DB 설정 후) | 11.1, 11.2 | DONE |
+| 11.4 | 데이터 접근 계층 구현 | developer | `src/lib/data.ts` — getAllVerbs(), getVerbWithExamples() 등 (unstable_cache + tags) | 타입 체크 통과 | 11.2 | DONE |
+| 11.5 | 페이지 리팩토링 (Server Component) | developer | page.tsx, verbs/page.tsx, verbs/[verb]/page.tsx → async + data.ts 호출 | 타입 체크 통과 | 11.4 | DONE |
+| 11.6 | 퀴즈 페이지 Server/Client 분리 | developer | quiz/page.tsx → Server 래퍼 + QuizClient.tsx | 타입 체크 통과 | 11.4 | DONE |
+| 11.7 | 진도 페이지 Server/Client 분리 | developer | progress/page.tsx → Server 래퍼 + ProgressClient.tsx | 타입 체크 통과 | 11.4 | DONE |
+| 11.8 | utils.ts 리팩토링 | developer | verbs import 제거, 인자 기반 순수 함수로 변경 | import 순환 없음, 타입 체크 통과 | 11.4 | DONE |
+| 11.9 | Revalidation API 구현 | developer | `/api/revalidate/route.ts` — secret 검증 + revalidateTag | 파일 생성 완료 | 11.4 | DONE |
+| 11.10 | .wiki/ 최신화 | pm | data-model, system-design, tech-stack, config, dependencies 5개 파일 갱신 | TODO 항목 제거, 실제 내용 반영 | - | DONE |
+| 11.11 | Supabase DB 설정 | devops | Dashboard에서 schema.sql 실행 + service_role 키 확인 | 테이블 생성 완료 | 11.1 | DONE |
+| 11.12 | 마이그레이션 실행 | devops | `npx tsx scripts/migrate.ts` 실행 | 1013개 예문 + 26개 퀴즈 이관 완료 | 11.11 | DONE |
+| 11.13 | 빌드 검증 | qa | `npm run build` + 전 라우트 동작 확인 | 빌드 성공, 전 페이지 정적 생성 (19/19) | 11.12 | DONE |
+| 11.14 | verbs.ts 정리 | developer | `src/data/verbs.ts` + `src/data/` 삭제, tsconfig에서 scripts 제외 | 빌드 성공, 데이터 소스 단일화 | 11.13 | DONE |
+
+## Phase 12: 대량 예문 투입 (PM 역할)
+
+| # | Task | 담당 | 내용 | 완료 기준 | Depends | Status |
+|---|------|------|------|-----------|---------|--------|
+| 12.1 | 예문 카테고리 확장 설계 | pm | 10개 신규 동사(come,run,turn,bring,set,look,pull,break,call,pick) + 카테고리(일상,비즈니스,SNS,여행,감정,학교/직장) 선정 | 카테고리 목록 확정 | 11.13 | DONE |
+| 12.2 | 대량 예문 생성 및 DB 적재 | pm | 5개 병렬 에이전트로 새 동사 1500개 + 기존 동사 확장 487개 투입 | 예문 3000개 DB 적재 달성 | 12.1 | DONE |
+| 12.3 | 퀴즈 문항 확장 | pm | 20개 동사 대상 신규 100개 퀴즈 생성 (fill-in-the-blank + multiple-choice) | 퀴즈 126개 DB 적재 | 12.2 | DONE |
+| 12.4 | 빌드 검증 | qa | 클린 빌드 + 전 라우트(29개 정적 페이지) 정상 생성 확인 | 빌드 성공, 20개 동사 페이지 생성 | 12.3 | DONE |

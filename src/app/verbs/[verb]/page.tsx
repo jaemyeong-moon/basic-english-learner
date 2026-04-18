@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { verbs } from "@/data/verbs";
+import { getAllVerbs, getAllVerbIds } from "@/lib/data";
 import { getVerbById, getAdjacentVerbs } from "@/lib/utils";
 import ExampleSentence from "@/components/ExampleSentence";
 
@@ -8,24 +8,27 @@ interface VerbPageProps {
   params: Promise<{ verb: string }>;
 }
 
-export function generateStaticParams() {
-  return verbs.map((v) => ({ verb: v.id }));
+export async function generateStaticParams() {
+  const ids = await getAllVerbIds();
+  return ids.map((id) => ({ verb: id }));
 }
 
 export async function generateMetadata({ params }: VerbPageProps) {
   const { verb: verbId } = await params;
-  const verb = getVerbById(verbId);
+  const verbs = await getAllVerbs();
+  const verb = getVerbById(verbs, verbId);
   if (!verb) return { title: "동사를 찾을 수 없습니다" };
   return { title: `${verb.verb} - ${verb.meaning} | 영어 구동사 학습` };
 }
 
 export default async function VerbDetailPage({ params }: VerbPageProps) {
   const { verb: verbId } = await params;
-  const verb = getVerbById(verbId);
+  const verbs = await getAllVerbs();
+  const verb = getVerbById(verbs, verbId);
 
   if (!verb) notFound();
 
-  const { prev, next } = getAdjacentVerbs(verbId);
+  const { prev, next } = getAdjacentVerbs(verbs, verbId);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">

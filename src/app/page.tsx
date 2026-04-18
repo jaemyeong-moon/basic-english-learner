@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { verbs } from "@/data/verbs";
+import { getAllVerbs } from "@/lib/data";
 
-export default function Home() {
+export default async function Home() {
+  const verbs = await getAllVerbs();
+
   return (
     <div>
       <section className="bg-gradient-to-b from-indigo-50 to-white py-20 dark:from-indigo-950/30 dark:to-zinc-950">

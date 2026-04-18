@@ -1,16 +1,15 @@
-import { verbs, quizQuestions } from "@/data/verbs";
-import { QuizQuestion, Token } from "@/types";
+import { Verb, QuizQuestion, Token } from "@/types";
 
-export function getVerbById(id: string) {
+export function getVerbById(verbs: Verb[], id: string) {
   return verbs.find((v) => v.id === id);
 }
 
-export function getVerbIndex(id: string) {
+export function getVerbIndex(verbs: Verb[], id: string) {
   return verbs.findIndex((v) => v.id === id);
 }
 
-export function getAdjacentVerbs(id: string) {
-  const index = getVerbIndex(id);
+export function getAdjacentVerbs(verbs: Verb[], id: string) {
+  const index = getVerbIndex(verbs, id);
   if (index === -1) return { prev: null, next: null };
   return {
     prev: index > 0 ? verbs[index - 1] : null,
@@ -27,11 +26,13 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export function getQuizQuestions(count: number = 10): QuizQuestion[] {
-  return shuffleArray(quizQuestions).slice(0, count);
+export function pickQuizQuestions(
+  allQuestions: QuizQuestion[],
+  count: number = 10
+): QuizQuestion[] {
+  return shuffleArray(allQuestions).slice(0, count);
 }
 
-// 영어 문장을 단어/비단어(구두점·공백) 토큰 배열로 분리
 export function tokenizeEnglish(sentence: string): Token[] {
   const tokens: Token[] = [];
   const regex = /([A-Za-z'-]+)|([^A-Za-z'-]+)/g;
